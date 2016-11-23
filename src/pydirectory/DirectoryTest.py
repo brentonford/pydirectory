@@ -6,13 +6,13 @@
  * Website : http://www.synerty.com
  * Support : support@synerty.com
 """
+import os
 import random
 import string
+import unittest
 from tempfile import mkstemp
 
-import os
-from twisted.trial import unittest
-
+from pydirectory.Directory import FileClobberError
 from .Directory import Directory
 
 
@@ -73,7 +73,7 @@ class DirectoryTest(unittest.TestCase):
 
         # Create a file that already exists
         d.createFile(pathName="clobber1")
-        self.assertRaises(AssertionError, d.createFile, pathName="clobber1")
+        self.assertRaises(FileClobberError, d.createFile, pathName="clobber1")
 
         self.assertEqual(num * 3 + 3, len(d.files))
 
@@ -83,6 +83,9 @@ class DirectoryTest(unittest.TestCase):
         self.assertEqual(len(d.files), len(files) - len(removeIndexes))
 
         dirPath = d.path
+
         d = None
-        self.assertTrue(not os.path.isdir(dirPath))
+
+
+        self.assertFalse(os.path.isdir(dirPath))
         print("COMPLETED makeRandomContents")

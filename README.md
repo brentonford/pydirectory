@@ -15,3 +15,7 @@ It can also be used when a temporary directory of files is needed, that will be 
 collected when it falls out of scope.
 
 This is especially usefull when using the tarfile, etc packages.
+
+# Usage
+Creating a directory, that will auto delete when it falls out of scope.
+For other options, see the documentation.

@@ -7,17 +7,16 @@
  * Support : support@synerty.com
 """
 
-import tempfile
+import os
 import shutil
+import tempfile
 import weakref
 from subprocess import check_output
-
-import os
 
 
 class DirSettings:
     tmpDirPath = '/tmp'
-    defaultDirChmod = 0x700
+    defaultDirChmod = 0o700
 
 
 __author__ = 'synerty'
@@ -30,8 +29,14 @@ class FileDisappearedError(Exception):
     pass
 
 
+class FileClobberError(Exception):
+    pass
+
+
 class Directory(object):
-    def __init__(self, initWithDir=None, autoDelete=True, inDir=None):
+    def __init__(self, initWithDir: bool = None,
+                 autoDelete: bool = True,
+                 inDir: str = None):
         self._files = {}
         self._autoDelete = autoDelete
 
@@ -51,37 +56,33 @@ class Directory(object):
         self.__cleanupRef = weakref.ref(self, cleanup)
 
     @property
-    def files(self):
+    def files(self) -> [File]:
         """ Files
         :return: A list of the Directory.File objects
         """
         return list(self._files.values())
 
     @property
-    def pathNames(self):
+    def pathNames(self) -> [str]:
         """ Path Names
         :return: A list of path + name of each file, relative to the directory root
         """
         return [f.pathName for f in list(self._files.values())]
 
     @property
-    def paths(self):
+    def paths(self) -> [str]:
         """ Paths
         :return: A list of the path names, effectively a list of relative directory
                   names
         """
         return set([f.path for f in list(self._files.values())])
 
-    @property
-    def tableOfContents(self):
-        return [f.archiveContentItem for f in self.files]
-
-    def getFile(self, path='', name=None, pathName=None):
+    def getFile(self, path: str = '', name: str = None, pathName: str = None) -> File:
         assert (name or pathName)
         pathName = (pathName if pathName else os.path.join(path, name))
         return self._files.get(pathName)
 
-    def createFile(self, path="", name=None, pathName=None):
+    def createFile(self, path: str = "", name: str = None, pathName: str = None) -> File:
         file = File(self, path=path, name=name, pathName=pathName)
         self._files[file.pathName] = file
         return file
@@ -95,7 +96,7 @@ class Directory(object):
     def scan(self):
         self._files = {}
         find = "find %s -type f" % self.path
-        output = check_output(args=find.split()).strip().split('\n')
+        output = check_output(args=find.split()).strip().decode().split('\n')
         output = [line for line in output if not "__MACOSX" in line]
         for pathName in output:
             if not pathName:  # Sometimes we get empty lines
@@ -139,7 +140,10 @@ class File(object):
 
         self._pathName = self.sanitise(self._pathName)
 
-        if exists != os.path.exists(self.realPath):
+        if not exists and os.path.exists(self.realPath):
+            raise FileClobberError(self.realPath)
+
+        if exists and not os.path.exists(self.realPath):
             raise FileDisappearedError(self.realPath)
 
         if not os.path.exists(self.realPath):
