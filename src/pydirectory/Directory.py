@@ -45,7 +45,11 @@ class Directory(object):
             self.scan()
 
         else:
-            self.path = tempfile.mkdtemp(dir=(inDir if inDir else DirSettings.tmpDirPath))
+            if (os.path.isdir(inDir if inDir else
+                              DirSettings.tmpDirPath) is False):
+                os.mkdir(inDir if inDir else DirSettings.tmpDirPath)
+            self.path = tempfile.mkdtemp(dir=(inDir if inDir else
+                                              DirSettings.tmpDirPath))
 
         closurePath = self.path
 
