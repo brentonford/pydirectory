@@ -56,7 +56,7 @@ class Directory(object):
         self.__cleanupRef = weakref.ref(self, cleanup)
 
     @property
-    def files(self) -> [File]:
+    def files(self) -> ['File']:
         """ Files
         :return: A list of the Directory.File objects
         """
@@ -77,12 +77,12 @@ class Directory(object):
         """
         return set([f.path for f in list(self._files.values())])
 
-    def getFile(self, path: str = '', name: str = None, pathName: str = None) -> File:
+    def getFile(self, path: str = '', name: str = None, pathName: str = None) -> 'File':
         assert (name or pathName)
         pathName = (pathName if pathName else os.path.join(path, name))
         return self._files.get(pathName)
 
-    def createFile(self, path: str = "", name: str = None, pathName: str = None) -> File:
+    def createFile(self, path: str = "", name: str = None, pathName: str = None) -> 'File':
         file = File(self, path=path, name=name, pathName=pathName)
         self._files[file.pathName] = file
         return file
