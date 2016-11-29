@@ -22,8 +22,12 @@ class DirSettings:
 
 __author__ = 'synerty'
 
-textchars = bytearray([7, 8, 9, 10, 12, 13, 27]) + bytearray(list(range(0x20, 0x100)))
-is_binary_string = lambda bytes_: bool(bytes_.translate(None, textchars))
+textChars = bytearray([7, 8, 9, 10, 12, 13, 27]) + bytearray(list(range(0x20,
+                                                                        0x100)))
+
+
+def is_binary_string(bytes_):
+    return bool(bytes_.translate(None, textChars))
 
 
 class FileDisappearedError(Exception):
@@ -54,7 +58,7 @@ class Directory(object):
 
         closurePath = self.path
 
-        def cleanup(me):
+        def cleanup():
             if autoDelete:
                 shutil.rmtree(closurePath)
 
@@ -70,24 +74,28 @@ class Directory(object):
     @property
     def pathNames(self) -> [str]:
         """ Path Names
-        :return: A list of path + name of each file, relative to the directory root
+        :return: A list of path + name of each file, relative to the directory
+        root
         """
         return [f.pathName for f in list(self._files.values())]
 
     @property
     def paths(self) -> [str]:
         """ Paths
-        :return: A list of the path names, effectively a list of relative directory
+        :return: A list of the path names, effectively a list of relative
+        directory
                   names
         """
         return set([f.path for f in list(self._files.values())])
 
-    def getFile(self, path: str = '', name: str = None, pathName: str = None) -> 'File':
+    def getFile(self, path: str = '', name: str = None,
+                pathName: str = None) -> 'File':
         assert (name or pathName)
         pathName = (pathName if pathName else os.path.join(path, name))
         return self._files.get(pathName)
 
-    def createFile(self, path: str = "", name: str = None, pathName: str = None) -> 'File':
+    def createFile(self, path: str = "", name: str = None,
+                   pathName: str = None) -> 'File':
         file = File(self, path=path, name=name, pathName=pathName)
         self._files[file.pathName] = file
         return file
@@ -257,7 +265,7 @@ class File(object):
         return os.stat(self.realPath).st_size
 
     @property
-    def mtime(self):
+    def mTime(self):
         return os.path.getmtime(self.realPath)
 
     @property
@@ -271,13 +279,13 @@ class File(object):
 
     def _realPath(self, newPathName=None):
         directory = self._directory()
-        assert (directory)
+        assert directory
         return os.path.join(directory.path,
                             newPathName if newPathName else self._pathName)
 
     def sanitise(self, pathName):
         assert isinstance(pathName, str)
-        assert not '..' in pathName
+        assert '..' not in pathName
         assert not pathName.endswith(os.sep)
 
         while pathName.startswith(os.sep):
