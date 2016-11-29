@@ -245,7 +245,8 @@ class File(object):
 
     def remove(self):
         """ Remove
-        Removes the file from the Directory object, file on file system remains on disk
+        Removes the file from the Directory object, file on file system remains
+        on disk
         """
         directory = self._directory()
         assert isinstance(directory, Directory)
