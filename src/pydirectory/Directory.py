@@ -12,6 +12,7 @@ import shutil
 import tempfile
 import weakref
 from subprocess import check_output
+from platform import system
 
 
 class DirSettings:
@@ -97,11 +98,30 @@ class Directory(object):
                             " an autoDelete directory")
         return tempfile.mkdtemp(dir=self.path, prefix=".")
 
+    def listFilesWIN(self):
+        output = []
+        for dirname, dirnames, filenames in os.walk(self.path):
+            # print path to all subdirectories first.
+            for subdirname in dirnames:
+                output.append(os.path.join(dirname, subdirname))
+            # print path to all filenames.
+            for filename in filenames:
+                output.append(os.path.join(dirname, filename))
+        return output
+
+    def listFilesLinux(self):
+        find = "find %s -type f" % self.path
+        output = check_output(args=find.split()).strip().decode().split(
+            '\n')
+        return output
+
     def scan(self):
         self._files = {}
-        find = "find %s -type f" % self.path
-        output = check_output(args=find.split()).strip().decode().split('\n')
-        output = [line for line in output if not "__MACOSX" in line]
+        if system() is "Windows":
+            output = self.listFilesWIN()
+        else:
+            output = self.listFilesLinux()
+        output = [line for line in output if "__MACOSX" not in line]
         for pathName in output:
             if not pathName:  # Sometimes we get empty lines
                 continue
