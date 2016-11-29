@@ -11,7 +11,7 @@ import random
 import string
 import unittest
 from tempfile import mkstemp
-from sys import platform
+from platform import system
 
 from pydirectory.Directory import FileClobberError
 from .Directory import Directory
@@ -47,12 +47,6 @@ class DirectoryTest(unittest.TestCase):
         addRecursiveDirs('')
         return directory
 
-    @unittest.skipIf(platform.startswith("win"), "requires Windows")
-    def createLinuxExistingPaths(self, d):
-        d.createFile(pathName="clobber1")
-        self.assertRaises(FileClobberError, d.createFile, pathName="clobber1")
-
-    @unittest.skipIf(platform.startswith("win"), "requires Windows")
     def createLinuxBadPaths(self, d):
         self.assertEqual(d.createFile(pathName="/abspath/name1").pathName,
                          'abspath/name1')
@@ -62,6 +56,16 @@ class DirectoryTest(unittest.TestCase):
                           pathName="/abspath/dir1/")
         self.assertRaises(AssertionError, d.createFile,
                           pathName="relpath/dir2/")
+
+    def createWindowsBadPaths(self, d):
+        self.assertEqual(d.createFile(pathName="\\abspath\\name1").pathName,
+                         'abspath\\name1')
+        self.assertEqual(d.createFile(pathName="relpath\\name2").pathName,
+                         "relpath\\name2")
+        self.assertRaises(AssertionError, d.createFile,
+                          pathName="\\abspath\\dir1\\")
+        self.assertRaises(AssertionError, d.createFile,
+                          pathName="relpath\\dir2\\")
 
     def testDir(self):
         d = Directory()
@@ -82,10 +86,15 @@ class DirectoryTest(unittest.TestCase):
                          name=self.makeRandomContents(10))
 
         # Create files with bad paths
-        self.createLinuxBadPaths(d)
+        if system() is not "Windows":
+            self.createLinuxBadPaths(d)
+        else:
+            self.createWindowsBadPaths(d)
 
         # Create a file that already exists
-        self.createLinuxExistingPaths(d)
+        d.createFile(pathName="clobber1")
+        self.assertRaises(FileClobberError, d.createFile,
+                          pathName="clobber1")
 
         self.assertEqual(num * 3 + 3, len(d.files))
 
