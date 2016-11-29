@@ -98,13 +98,11 @@ class Directory(object):
                             " an autoDelete directory")
         return tempfile.mkdtemp(dir=self.path, prefix=".")
 
-    def listFilesWIN(self):
+    def listFilesWin(self):
         output = []
         for dirname, dirnames, filenames in os.walk(self.path):
-            # print path to all subdirectories first.
             for subdirname in dirnames:
                 output.append(os.path.join(dirname, subdirname))
-            # print path to all filenames.
             for filename in filenames:
                 output.append(os.path.join(dirname, filename))
         return output
@@ -118,7 +116,7 @@ class Directory(object):
     def scan(self):
         self._files = {}
         if system() is "Windows":
-            output = self.listFilesWIN()
+            output = self.listFilesWin()
         else:
             output = self.listFilesLinux()
         output = [line for line in output if "__MACOSX" not in line]
