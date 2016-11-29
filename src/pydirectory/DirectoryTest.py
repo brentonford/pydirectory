@@ -11,6 +11,7 @@ import random
 import string
 import unittest
 from tempfile import mkstemp
+from platform import system
 
 from pydirectory.Directory import FileClobberError
 from .Directory import Directory
@@ -46,6 +47,26 @@ class DirectoryTest(unittest.TestCase):
         addRecursiveDirs('')
         return directory
 
+    def createLinuxBadPaths(self, d):
+        self.assertEqual(d.createFile(pathName="/abspath/name1").pathName,
+                         'abspath/name1')
+        self.assertEqual(d.createFile(pathName="relpath/name2").pathName,
+                         "relpath/name2")
+        self.assertRaises(AssertionError, d.createFile,
+                          pathName="/abspath/dir1/")
+        self.assertRaises(AssertionError, d.createFile,
+                          pathName="relpath/dir2/")
+
+    def createWindowsBadPaths(self, d):
+        self.assertEqual(d.createFile(pathName="\\abspath\\name1").pathName,
+                         'abspath\\name1')
+        self.assertEqual(d.createFile(pathName="relpath\\name2").pathName,
+                         "relpath\\name2")
+        self.assertRaises(AssertionError, d.createFile,
+                          pathName="\\abspath\\dir1\\")
+        self.assertRaises(AssertionError, d.createFile,
+                          pathName="relpath\\dir2\\")
+
     def testDir(self):
         d = Directory()
         assert (os.path.isdir(d.path))
@@ -65,15 +86,15 @@ class DirectoryTest(unittest.TestCase):
                          name=self.makeRandomContents(10))
 
         # Create files with bad paths
-        self.assertEqual(d.createFile(pathName="/abspath/name1").pathName,
-                         'abspath/name1')
-        self.assertEqual(d.createFile(pathName="relpath/name2").pathName, "relpath/name2")
-        self.assertRaises(AssertionError, d.createFile, pathName="/abspath/dir1/")
-        self.assertRaises(AssertionError, d.createFile, pathName="relpath/dir2/")
+        if system() is not "Windows":
+            self.createLinuxBadPaths(d)
+        else:
+            self.createWindowsBadPaths(d)
 
         # Create a file that already exists
         d.createFile(pathName="clobber1")
-        self.assertRaises(FileClobberError, d.createFile, pathName="clobber1")
+        self.assertRaises(FileClobberError, d.createFile,
+                          pathName="clobber1")
 
         self.assertEqual(num * 3 + 3, len(d.files))
 
@@ -85,7 +106,6 @@ class DirectoryTest(unittest.TestCase):
         dirPath = d.path
 
         d = None
-
 
         self.assertFalse(os.path.isdir(dirPath))
         print("COMPLETED makeRandomContents")

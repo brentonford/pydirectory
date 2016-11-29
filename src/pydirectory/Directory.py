@@ -12,6 +12,7 @@ import shutil
 import tempfile
 import weakref
 from subprocess import check_output
+from platform import system
 
 
 class DirSettings:
@@ -45,7 +46,11 @@ class Directory(object):
             self.scan()
 
         else:
-            self.path = tempfile.mkdtemp(dir=(inDir if inDir else DirSettings.tmpDirPath))
+            if (os.path.isdir(inDir if inDir else
+                              DirSettings.tmpDirPath) is False):
+                os.mkdir(inDir if inDir else DirSettings.tmpDirPath)
+            self.path = tempfile.mkdtemp(dir=(inDir if inDir else
+                                              DirSettings.tmpDirPath))
 
         closurePath = self.path
 
@@ -56,7 +61,7 @@ class Directory(object):
         self.__cleanupRef = weakref.ref(self, cleanup)
 
     @property
-    def files(self) -> [File]:
+    def files(self) -> ['File']:
         """ Files
         :return: A list of the Directory.File objects
         """
@@ -77,12 +82,12 @@ class Directory(object):
         """
         return set([f.path for f in list(self._files.values())])
 
-    def getFile(self, path: str = '', name: str = None, pathName: str = None) -> File:
+    def getFile(self, path: str = '', name: str = None, pathName: str = None) -> 'File':
         assert (name or pathName)
         pathName = (pathName if pathName else os.path.join(path, name))
         return self._files.get(pathName)
 
-    def createFile(self, path: str = "", name: str = None, pathName: str = None) -> File:
+    def createFile(self, path: str = "", name: str = None, pathName: str = None) -> 'File':
         file = File(self, path=path, name=name, pathName=pathName)
         self._files[file.pathName] = file
         return file
@@ -93,11 +98,28 @@ class Directory(object):
                             " an autoDelete directory")
         return tempfile.mkdtemp(dir=self.path, prefix=".")
 
+    def listFilesWin(self):
+        output = []
+        for dirname, dirnames, filenames in os.walk(self.path):
+            for subdirname in dirnames:
+                output.append(os.path.join(dirname, subdirname))
+            for filename in filenames:
+                output.append(os.path.join(dirname, filename))
+        return output
+
+    def listFilesLinux(self):
+        find = "find %s -type f" % self.path
+        output = check_output(args=find.split()).strip().decode().split(
+            '\n')
+        return output
+
     def scan(self):
         self._files = {}
-        find = "find %s -type f" % self.path
-        output = check_output(args=find.split()).strip().decode().split('\n')
-        output = [line for line in output if not "__MACOSX" in line]
+        if system() is "Windows":
+            output = self.listFilesWin()
+        else:
+            output = self.listFilesLinux()
+        output = [line for line in output if "__MACOSX" not in line]
         for pathName in output:
             if not pathName:  # Sometimes we get empty lines
                 continue
@@ -223,7 +245,8 @@ class File(object):
 
     def remove(self):
         """ Remove
-        Removes the file from the Directory object, file on file system remains on disk
+        Removes the file from the Directory object, file on file system remains
+        on disk
         """
         directory = self._directory()
         assert isinstance(directory, Directory)
