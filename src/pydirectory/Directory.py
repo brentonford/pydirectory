@@ -25,6 +25,8 @@ __author__ = 'synerty'
 textChars = bytearray([7, 8, 9, 10, 12, 13, 27]) + bytearray(list(range(0x20,
                                                                         0x100)))
 
+isWindows = system() is "Windows"
+
 
 def is_binary_string(bytes_):
     return bool(bytes_.translate(None, textChars))
@@ -106,7 +108,7 @@ class Directory(object):
                             " an autoDelete directory")
         return tempfile.mkdtemp(dir=self.path, prefix=".")
 
-    def listFilesWin(self):
+    def _listFilesWin(self):
         output = []
         for dirname, dirnames, filenames in os.walk(self.path):
             for subdirname in dirnames:
@@ -115,7 +117,7 @@ class Directory(object):
                 output.append(os.path.join(dirname, filename))
         return output
 
-    def listFilesLinux(self):
+    def _listFilesLinux(self):
         find = "find %s -type f" % self.path
         output = check_output(args=find.split()).strip().decode().split(
             '\n')
@@ -123,10 +125,7 @@ class Directory(object):
 
     def scan(self):
         self._files = {}
-        if system() is "Windows":
-            output = self.listFilesWin()
-        else:
-            output = self.listFilesLinux()
+        output = self._listFilesWin() if isWindows else self._listFilesLinux()
         output = [line for line in output if "__MACOSX" not in line]
         for pathName in output:
             if not pathName:  # Sometimes we get empty lines
