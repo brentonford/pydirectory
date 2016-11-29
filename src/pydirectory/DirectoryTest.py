@@ -10,11 +10,14 @@ import os
 import random
 import string
 import unittest
-from sys import platform
+from platform import system
 from tempfile import mkstemp
 
 from pydirectory.Directory import FileClobberError
 from .Directory import Directory
+
+
+isWindows = system() is "Windows"
 
 
 class DirectoryTest(unittest.TestCase):
@@ -48,7 +51,7 @@ class DirectoryTest(unittest.TestCase):
         return directory
 
     # Create files with bad paths
-    @unittest.skipUnless(platform.startswith("win"),
+    @unittest.skipUnless(isWindows,
                          "Windows detected, skipping testCreateWindowsBadPaths.")
     def testCreateWindowsBadPaths(self):
         d = Directory()
@@ -63,7 +66,7 @@ class DirectoryTest(unittest.TestCase):
         self.assertEqual(2, len(d.files))
         print("COMPLETED testCreateWindowsBadPaths")
 
-    @unittest.skipIf(platform.startswith("win"),
+    @unittest.skipIf(isWindows,
                      "Windows detected, skipping testCreateLinuxBadPaths.")
     def testCreateLinuxBadPaths(self):
         d = Directory()
