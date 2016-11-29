@@ -58,7 +58,7 @@ class Directory(object):
 
         closurePath = self.path
 
-        def cleanup():
+        def cleanup(me):
             if autoDelete:
                 shutil.rmtree(closurePath)
 

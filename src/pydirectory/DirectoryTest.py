@@ -105,5 +105,7 @@ class DirectoryTest(unittest.TestCase):
 
         dirPath = d.path
 
+        d = None
+
         self.assertFalse(os.path.isdir(dirPath))
         print("COMPLETED makeRandomContents")
