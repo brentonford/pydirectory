@@ -52,7 +52,8 @@ class DirectoryTest(unittest.TestCase):
 
     # Create files with bad paths
     @unittest.skipUnless(isWindows,
-                         "Windows detected, skipping testCreateWindowsBadPaths.")
+                         "Not Windows detected, skipping "
+                         "testCreateWindowsBadPaths.")
     def testCreateWindowsBadPaths(self):
         d = Directory()
         self.assertEqual(d.createFile(pathName="\\abspath\\name1").pathName,
