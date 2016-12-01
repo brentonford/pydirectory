@@ -19,3 +19,8 @@ This is especially use full when using the tarfile, etc packages.
 # Usage
 Creating a directory, that will auto delete when it falls out of scope.
 For other options, see the documentation.
+
+# Getting Started
+The pydirectory package can be installed from pypi:
+
+`pip install pydirectory`
