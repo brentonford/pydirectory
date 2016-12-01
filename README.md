@@ -7,7 +7,7 @@ A class representing a file system directory, that deletes on garbage collect.
 # The Directory object can be 
 * Initialised on an existing directory
 * Scan that directory
-* Be integrated for the file list
+* Be interrogated for the file list
 * Create new files
 * Open files
 
