@@ -22,8 +22,14 @@ class DirSettings:
 
 __author__ = 'synerty'
 
-textchars = bytearray([7, 8, 9, 10, 12, 13, 27]) + bytearray(list(range(0x20, 0x100)))
-is_binary_string = lambda bytes_: bool(bytes_.translate(None, textchars))
+textChars = bytearray([7, 8, 9, 10, 12, 13, 27]) + bytearray(list(range(0x20,
+                                                                        0x100)))
+
+isWindows = system() is "Windows"
+
+
+def is_binary_string(bytes_):
+    return bool(bytes_.translate(None, textChars))
 
 
 class FileDisappearedError(Exception):
@@ -70,35 +76,39 @@ class Directory(object):
     @property
     def pathNames(self) -> [str]:
         """ Path Names
-        :return: A list of path + name of each file, relative to the directory root
+        @return: A list of path + name of each file, relative to the directory
+        root
         """
         return [f.pathName for f in list(self._files.values())]
 
     @property
     def paths(self) -> [str]:
         """ Paths
-        :return: A list of the path names, effectively a list of relative directory
+        :return: A list of the path names, effectively a list of relative
+        directory
                   names
         """
         return set([f.path for f in list(self._files.values())])
 
-    def getFile(self, path: str = '', name: str = None, pathName: str = None) -> 'File':
+    def getFile(self, path: str = '', name: str = None,
+                pathName: str = None) -> 'File':
         assert (name or pathName)
         pathName = (pathName if pathName else os.path.join(path, name))
         return self._files.get(pathName)
 
-    def createFile(self, path: str = "", name: str = None, pathName: str = None) -> 'File':
+    def createFile(self, path: str = "", name: str = None,
+                   pathName: str = None) -> 'File':
         file = File(self, path=path, name=name, pathName=pathName)
         self._files[file.pathName] = file
         return file
 
-    def createHiddenFolder(self):
+    def createHiddenFolder(self) -> 'File':
         if not self._autoDelete:
             raise Exception("Hidden folders can only be created within"
                             " an autoDelete directory")
         return tempfile.mkdtemp(dir=self.path, prefix=".")
 
-    def listFilesWin(self):
+    def _listFilesWin(self) -> ['File']:
         output = []
         for dirname, dirnames, filenames in os.walk(self.path):
             for subdirname in dirnames:
@@ -107,18 +117,15 @@ class Directory(object):
                 output.append(os.path.join(dirname, filename))
         return output
 
-    def listFilesLinux(self):
+    def _listFilesLinux(self) -> ['File']:
         find = "find %s -type f" % self.path
         output = check_output(args=find.split()).strip().decode().split(
             '\n')
         return output
 
-    def scan(self):
+    def scan(self) -> ['File']:
         self._files = {}
-        if system() is "Windows":
-            output = self.listFilesWin()
-        else:
-            output = self.listFilesLinux()
+        output = self._listFilesWin() if isWindows else self._listFilesLinux()
         output = [line for line in output if "__MACOSX" not in line]
         for pathName in output:
             if not pathName:  # Sometimes we get empty lines
@@ -130,24 +137,24 @@ class Directory(object):
 
         return self.files
 
-    def clone(self, autoDelete=True):
+    def clone(self, autoDelete: bool = True) -> 'Directory':
         d = Directory(autoDelete=autoDelete)
         os.rmdir(d.path)  # shutil doesn't like it existing
         shutil.copytree(self.path, d.path)
         d.scan()
         return d
 
-    def _fileDeleted(self, file):
+    def _fileDeleted(self, file: 'File'):
         self._files.pop(file.pathName)
 
-    def _fileMoved(self, oldPathName, file):
+    def _fileMoved(self, oldPathName: str, file: 'File'):
         self._files.pop(oldPathName)
         self._files[file.pathName] = file
 
 
 class File(object):
-    def __init__(self, directory, path='', name=None, pathName=None,
-                 exists=False):
+    def __init__(self, directory: Directory, path: str ='', name: str =None,
+                 pathName: str =None, exists: bool =False):
         assert (isinstance(directory, Directory))
         assert (name or pathName)
 
@@ -175,30 +182,30 @@ class File(object):
 
     # ----- Name and Path setters
     @property
-    def path(self):
+    def path(self) -> str:
         return os.path.dirname(self.pathName)
 
     @path.setter
-    def path(self, path):
+    def path(self, path: str):
         path = path if path else ''
         self.pathName = os.path.join(path, self.name)
 
     @property
-    def name(self):
+    def name(self) -> str:
         return os.path.basename(self.pathName)
 
     @name.setter
-    def name(self, name):
+    def name(self, name: str):
         self.pathName = os.path.join(self.path, name)
 
     # ----- pathName functions
 
     @property
-    def pathName(self):
+    def pathName(self) -> str:
         return self._pathName
 
     @pathName.setter
-    def pathName(self, pathName):
+    def pathName(self, pathName: str):
         if self.pathName == pathName:
             return
 
@@ -221,7 +228,7 @@ class File(object):
 
     # ----- Util functions
 
-    def open(self, append=False, write=False):
+    def open(self, append: bool =False, write: bool =False):
         flag = {(False, False): 'r',
                 (True, False): 'a',
                 (True, True): 'a',
@@ -253,11 +260,11 @@ class File(object):
         directory._fileDeleted(self)
 
     @property
-    def size(self):
+    def size(self) -> str:
         return os.stat(self.realPath).st_size
 
     @property
-    def mtime(self):
+    def mTime(self) -> str:
         return os.path.getmtime(self.realPath)
 
     @property
@@ -266,18 +273,18 @@ class File(object):
             return not is_binary_string(self.open().read(40000))
 
     @property
-    def realPath(self):
+    def realPath(self) -> str:
         return self._realPath()
 
-    def _realPath(self, newPathName=None):
+    def _realPath(self, newPathName: str =None) -> str:
         directory = self._directory()
-        assert (directory)
+        assert directory
         return os.path.join(directory.path,
                             newPathName if newPathName else self._pathName)
 
-    def sanitise(self, pathName):
+    def sanitise(self, pathName: str) -> str:
         assert isinstance(pathName, str)
-        assert not '..' in pathName
+        assert '..' not in pathName
         assert not pathName.endswith(os.sep)
 
         while pathName.startswith(os.sep):

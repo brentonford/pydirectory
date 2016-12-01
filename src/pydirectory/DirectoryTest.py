@@ -10,11 +10,14 @@ import os
 import random
 import string
 import unittest
-from tempfile import mkstemp
 from platform import system
+from tempfile import mkstemp
 
 from pydirectory.Directory import FileClobberError
 from .Directory import Directory
+
+
+isWindows = system() is "Windows"
 
 
 class DirectoryTest(unittest.TestCase):
@@ -47,17 +50,12 @@ class DirectoryTest(unittest.TestCase):
         addRecursiveDirs('')
         return directory
 
-    def createLinuxBadPaths(self, d):
-        self.assertEqual(d.createFile(pathName="/abspath/name1").pathName,
-                         'abspath/name1')
-        self.assertEqual(d.createFile(pathName="relpath/name2").pathName,
-                         "relpath/name2")
-        self.assertRaises(AssertionError, d.createFile,
-                          pathName="/abspath/dir1/")
-        self.assertRaises(AssertionError, d.createFile,
-                          pathName="relpath/dir2/")
-
-    def createWindowsBadPaths(self, d):
+    # Create files with bad paths
+    @unittest.skipUnless(isWindows,
+                         "Not Windows detected, skipping "
+                         "testCreateWindowsBadPaths.")
+    def testCreateWindowsBadPaths(self):
+        d = Directory()
         self.assertEqual(d.createFile(pathName="\\abspath\\name1").pathName,
                          'abspath\\name1')
         self.assertEqual(d.createFile(pathName="relpath\\name2").pathName,
@@ -66,6 +64,23 @@ class DirectoryTest(unittest.TestCase):
                           pathName="\\abspath\\dir1\\")
         self.assertRaises(AssertionError, d.createFile,
                           pathName="relpath\\dir2\\")
+        self.assertEqual(2, len(d.files))
+        print("COMPLETED testCreateWindowsBadPaths")
+
+    @unittest.skipIf(isWindows,
+                     "Windows detected, skipping testCreateLinuxBadPaths.")
+    def testCreateLinuxBadPaths(self):
+        d = Directory()
+        self.assertEqual(d.createFile(pathName="/abspath/name1").pathName,
+                         'abspath/name1')
+        self.assertEqual(d.createFile(pathName="relpath/name2").pathName,
+                         "relpath/name2")
+        self.assertRaises(AssertionError, d.createFile,
+                          pathName="/abspath/dir1/")
+        self.assertRaises(AssertionError, d.createFile,
+                          pathName="relpath/dir2/")
+        self.assertEqual(2, len(d.files))
+        print("COMPLETED testCreateLinuxBadPaths")
 
     def testDir(self):
         d = Directory()
@@ -85,18 +100,12 @@ class DirectoryTest(unittest.TestCase):
             d.createFile(path=self.makeRandomContents(10),
                          name=self.makeRandomContents(10))
 
-        # Create files with bad paths
-        if system() is not "Windows":
-            self.createLinuxBadPaths(d)
-        else:
-            self.createWindowsBadPaths(d)
-
         # Create a file that already exists
         d.createFile(pathName="clobber1")
         self.assertRaises(FileClobberError, d.createFile,
                           pathName="clobber1")
 
-        self.assertEqual(num * 3 + 3, len(d.files))
+        self.assertEqual(num * 3 + 1, len(d.files))
 
         files = d.files[:]
         removeIndexes = list(range(0, len(files), 3))
