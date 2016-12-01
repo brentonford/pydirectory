@@ -7,7 +7,7 @@ setup(
     description='A class representing a file system directory, that deletes on '
                 'garbage collect.',
     author='Synerty',
-    author_email='jarrod.chesney@synerty.com',
+    author_email='support@synerty.com',
     url='https://github.com/Synerty/pydirectory',
     # use the URL to the github repo
     download_url='https://github.com/Synerty/pydirectory/tarball/0.1',
