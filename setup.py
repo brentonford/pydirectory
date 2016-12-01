@@ -1,8 +1,10 @@
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(
     name='pydirectory',
-    packages=['pydirectory'],  # this must be the same as the name above
+    packages=find_packages(exclude=['contrib', 'docs', 'tests']),  # this
+    # must be the same as the name
+    # above
     version='0.1.0',
     description='A class representing a file system directory, that deletes on '
                 'garbage collect.',
