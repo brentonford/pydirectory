@@ -13,7 +13,7 @@ import unittest
 from platform import system
 from tempfile import mkstemp
 
-from pydirectory.Directory import FileClobberError
+from pytmpdir.Directory import FileClobberError
 from .Directory import Directory
 
 
