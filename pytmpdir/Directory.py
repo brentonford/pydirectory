@@ -18,7 +18,7 @@ from platform import system
 class DirSettings:
     """ Directory Settings
 
-    Configuration.
+    User configuration settings.
     """
 
     tmpDirPath = '/tmp'
@@ -65,16 +65,22 @@ class FileClobberError(Exception):
 
 
 class Directory(object):
+    """ Directory
+
+    Functions as a directory object to extract, archive and pass around code.
+    Auto deletes when the directory falls out of scope.
+    """
+
     def __init__(self, initWithDir: bool = None,
                  autoDelete: bool = True,
                  inDir: str = None):
-        """ Directory
+        """ Directory Initialise
 
-        If the directory doesn't exist create a temporary folder.
+        Creates a temporary directory if the directory doesn't exist.
 
         @param initWithDir: Force creation of temporary directory.
-        @param autoDelete: Remove temporary files and folders.
-        @param inDir: Current directory
+        @param autoDelete: Remove temporary files and folders.  Default as True.
+        @param inDir: Current directory.
         @type initWithDir: Boolean
         @type autoDelete: Boolean
         @type inDir: String
@@ -101,6 +107,7 @@ class Directory(object):
 
             Recursively delete a directory tree of the created path.
             """
+
             if autoDelete:
                 shutil.rmtree(closurePath)
 
@@ -110,26 +117,29 @@ class Directory(object):
     def files(self) -> ['File']:
         """ Files
 
-        @return: A list of the Directory.File objects
+        @return: A list of the Directory.File objects.
         """
+
         return list(self._files.values())
 
     @property
     def pathNames(self) -> [str]:
         """ Path Names
 
-        @return: A list of path + name of each file, relative to the directory
-        root
+        @return: A list of path + name of each file, relative to the root
+        directory.
         """
+
         return [f.pathName for f in list(self._files.values())]
 
     @property
     def paths(self) -> [str]:
         """ Paths
 
-        @return: A list of the path names, effectively a list of relative
-        directory names
+        @return: A list of the paths, effectively a list of relative
+        directory names.
         """
+
         return set([f.path for f in list(self._files.values())])
 
     def getFile(self, path: str = '', name: str = None,
@@ -138,7 +148,7 @@ class Directory(object):
 
         Get File name corresponding to a path name.
 
-        @param path: File path.
+        @param path: File path.  Default as empty string.
         @param name: File name to be used if passed.
         @param pathName: Joined file name and path to be used if passed.
         @type path: String
@@ -151,13 +161,13 @@ class Directory(object):
         pathName = (pathName if pathName else os.path.join(path, name))
         return self._files.get(pathName)
 
-    def createFile(self, path: str = "", name: str = None,
+    def createFile(self, path: str = '', name: str = None,
                    pathName: str = None) -> 'File':
         """ Create File
 
         Creates a new file and updates file dictionary.
 
-        @param path: File path.
+        @param path: File path.  Defaults as empty string.
         @param name: File name to be used if passed.
         @param pathName: Joined file name and path to be used if passed.
         @type path: String
@@ -241,10 +251,12 @@ class Directory(object):
         Recursively copy a directory tree.  Removes the destination
         directory as the destination directory must not already exist.
 
-        @param autoDelete: Used to clean up files on completion.
+        @param autoDelete: Used to clean up files on completion.  Default as
+        True.
         @type autoDelete: Boolean
         @return: The cloned directory.
         """
+
         d = Directory(autoDelete=autoDelete)
         os.rmdir(d.path)  # shutil doesn't like it existing
         shutil.copytree(self.path, d.path)
@@ -283,14 +295,13 @@ class File(object):
         """ File
 
         Test whether a path exists.  Set the access and modified time of
-        path.  Change the access
-        permissions of a file.
+        path.  Change the access permissions of a file.
 
-        @param directory: Directory instance.
+        @param directory: Directory instance.  Default as empty string.
         @param path: File path.
         @param name: File name to be used if passed.
         @param pathName: Joined file name and path to be used if passed.
-        @param exists: passed argument default as False.
+        @param exists: Passed argument.  Default as False.
         @type directory: Directory
         @type path: String
         @type name: String
@@ -419,8 +430,9 @@ class File(object):
         Pass arguments and return open file.
 
         @param append: Open for writing, appending to the end of the file if
-        it exists.
-        @param write: Open for writing, truncating the file first.
+        it exists.  Default as False.
+        @param write: Open for writing, truncating the file first.  Default
+        as False.
         @type append: Boolean
         @type write: Boolean
         @return: Open file function.

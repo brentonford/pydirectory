@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='pydirectory',
+    name='pytmpdir',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),  # this
     # must be the same as the name
     # above
