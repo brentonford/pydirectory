@@ -57,11 +57,11 @@ local_settings.py
 instance/
 .webassets-cache
 
-# Scrapy stuff:
+# Scrapy stuff:`
 .scrapy
 
 # Sphinx documentation
-docs/_build/
+docs/build/*
 
 # PyBuilder
 target/
