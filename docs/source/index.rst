@@ -10,7 +10,8 @@ Welcome to pytmpdir's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   getting_started
+   README
+   modules
    LICENSE
 
 
