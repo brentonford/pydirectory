@@ -13,8 +13,7 @@ import unittest
 from platform import system
 from tempfile import mkstemp
 
-from pytmpdir.Directory import FileClobberError
-from .Directory import Directory
+from Directory import Directory, FileClobberError
 
 
 isWindows = system() is "Windows"
