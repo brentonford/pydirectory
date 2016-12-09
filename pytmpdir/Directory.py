@@ -33,17 +33,17 @@ textChars = bytearray([7, 8, 9, 10, 12, 13, 27]) + bytearray(list(range(0x20,
 isWindows = system() is "Windows"
 
 
-def is_binary_string(bytes_):
+def is_binary_string(bytesVariable):
     """ Is Binary String
 
     Determines if the input variable contains specific ASCII
     characters.
 
-    @param bytes_: Input variable being checked if string.
+    @param bytesVariable: Input variable being checked if string.
     @return: True if variable is string.
     """
 
-    return bool(bytes_.translate(None, textChars))
+    return bool(bytesVariable.translate(None, textChars))
 
 
 class FileDisappearedError(Exception):
