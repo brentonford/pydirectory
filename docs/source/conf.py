@@ -20,7 +20,8 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('scripts'))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                                                "pytmpdir")))
 
 
 # -- General configuration ------------------------------------------------
@@ -158,6 +159,3 @@ texinfo_documents = [
      author, 'pytmpdir', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
