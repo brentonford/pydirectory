@@ -10,13 +10,9 @@ import os
 import random
 import string
 import unittest
-from platform import system
 from tempfile import mkstemp
 
-from Directory import Directory, FileClobberError
-
-
-isWindows = system() is "Windows"
+from Directory import Directory, FileClobberError, isWindows
 
 
 class DirectoryTest(unittest.TestCase):
