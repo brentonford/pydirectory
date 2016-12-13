@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-echo "Building documentation for pytmpdir!"
+echo "Building Sphinx documentation for pytmpdir!"
 echo "Removing old documentation in build folder."
-rmdir -rf build
+rm -frv build
 echo "Updating module rst files.  This will overwrite old rst files."
-cd ../pytmpdir
-sphinx-apidoc -f -o ../docs/source .
+set PYTHONPATH="C:\Users\brentonford\Documents\ORMOB\pytmpdir"
+sphinx-apidoc -f -o ../docs/source ../pytmpdir
 echo "Build HTML files."
-cd ../docs
 sphinx-build -b html source build
 echo "Opening created documentation..."
-start build\index.html
+start build/index.html
