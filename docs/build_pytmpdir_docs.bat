@@ -4,6 +4,8 @@ echo Removing old documentation in build folder.
 rmdir build /s /q
 echo Updating module rst files.  This will overwrite old rst files.
 cd ..\pytmpdir
+set PYTHONPATH="C:\Users\brentonford\Documents\ORMOB\pydirectory"
+
 sphinx-apidoc -f -o ..\docs\source .
 echo Build HTML files.
 cd ..\docs
