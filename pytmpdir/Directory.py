@@ -1,11 +1,11 @@
-"""
- * Created by Synerty Pty Ltd
- *
- * This software is open source, the MIT license applies.
- *
- * Website : http://www.synerty.com
- * Support : support@synerty.com
-"""
+
+# Created by Synerty Pty Ltd
+# Copyright (C) 2013-2017 Synerty Pty Ltd (Australia)
+#
+# This software is open source, the MIT license applies.
+#
+# Website : http://www.synerty.com
+# Support : support@synerty.com
 
 import os
 import shutil

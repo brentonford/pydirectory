@@ -4,7 +4,7 @@ echo "Removing old documentation in build folder."
 rm -frv docs/build
 echo "Updating module rst files.  This will overwrite old rst files."
 export PYTHONPATH="`pwd`"
-sphinx-apidoc -f -o docs/source pytmpdir
+sphinx-apidoc -f -e -o docs/source pytmpdir '*Test.py'
 echo "Build HTML files."
 sphinx-build -b html docs/source docs/build
 echo "Opening created documentation..."
