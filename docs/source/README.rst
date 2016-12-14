@@ -11,7 +11,7 @@ A class representing a file system directory, that deletes on garbage collect.
 
 Requirements
 ------------
-- Python 3.5
+- Python 3.3+ (Tested on python 3.5)
 
 The Directory object can be
 ---------------------------
