@@ -1,18 +1,19 @@
-"""
- * Created by Synerty Pty Ltd
- *
- * This software is open source, the MIT license applies.
- *
- * Website : http://www.synerty.com
- * Support : support@synerty.com
-"""
+
+# Created by Synerty Pty Ltd
+# Copyright (C) 2013-2017 Synerty Pty Ltd (Australia)
+#
+# This software is open source, the MIT license applies.
+#
+# Website : http://www.synerty.com
+# Support : support@synerty.com
+
 import os
 import random
 import string
 import unittest
 from tempfile import mkstemp
 
-from Directory import Directory, FileClobberError, isWindows
+from pytmpdir.Directory import Directory, FileClobberError, isWindows
 
 
 class DirectoryTest(unittest.TestCase):

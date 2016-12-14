@@ -4,22 +4,9 @@ pytmpdir package
 Submodules
 ----------
 
-pytmpdir.Directory module
--------------------------
+.. toctree::
 
-.. automodule:: pytmpdir.Directory
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-pytmpdir.DirectoryTest module
------------------------------
-
-.. automodule:: pytmpdir.DirectoryTest
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   pytmpdir.Directory
 
 Module contents
 ---------------
