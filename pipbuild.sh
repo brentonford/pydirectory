@@ -16,8 +16,6 @@ if ! [ -f "setup.py" ]; then
     exit 1
 fi
 
-VER="${1:?You must pass a version of the format 0.0.0 as the only argument}"
-
 if git tag | grep -q "${VER}"; then
     echo "Git tag for version ${VER} already exists." >&2
     exit 1
