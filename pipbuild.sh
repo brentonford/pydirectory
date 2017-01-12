@@ -11,8 +11,6 @@ if [ -n "$(git status --porcelain)" ]; then
     exit 1
 fi
 
-VER=0.1.1
-
 VER="${0:?You must pass a version of the format 0.0.0 as the only argument}"
 
 if ! [ -f "setup.py" ]; then
