@@ -11,11 +11,13 @@ if [ -n "$(git status --porcelain)" ]; then
     exit 1
 fi
 
+VER="${1:?You must pass a version of the format 0.0.0 as the only argument}"
+
 if ! [ -f "setup.py" ]; then
     echo "setver.sh must be run in the directory where setup.py is" >&2
     exit 1
 fi
-
+git
 if git tag | grep -q "${VER}"; then
     echo "Git tag for version ${VER} already exists." >&2
     exit 1
