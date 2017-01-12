@@ -11,7 +11,7 @@ if [ -n "$(git status --porcelain)" ]; then
     exit 1
 fi
 
-VER="${1:?You must pass a version of the format 0.0.0 as the only argument}"
+VER="${0.1.1:?You must pass a version of the format 0.0.0 as the only argument}"
 
 if ! [ -f "setup.py" ]; then
     echo "setver.sh must be run in the directory where setup.py is" >&2
